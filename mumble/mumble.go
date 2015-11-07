@@ -61,8 +61,6 @@ func (m *Mumble) Create() {
 					c.Temporary = gc.Temporary
 
 					Channels[gc.Name] = c
-				} else {
-					gc.Remove()
 				}
 			}
 

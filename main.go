@@ -19,14 +19,7 @@ func main() {
 
 	// insecure
 	ins := os.Getenv("FUMBLE_INSECURE")
-	if ins == "" {
-		ins = "true"
-	}
-
-	insecure, err := strconv.ParseBool(ins)
-	if err != nil {
-		log.Fatal(err)
-	}
+	insecure := (ins == "true")
 	// end: insecure
 
 	// certificate
