@@ -189,7 +189,6 @@ func (u *User) IsConnected() bool {
 	// check if any info was specified
 	if by == "" {
 		return false
-		//return errors.New("Provide a Name, IP, UserID or Hash!")
 	}
 
 	// loop through all connecTed users
