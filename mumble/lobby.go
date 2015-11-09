@@ -70,13 +70,17 @@ func (l *Lobby) AllowPlayer(u *User) {
 	l.Players[u.Name] = u
 
 	l.Channel.AllowUser(u)
-	l.Channel.Children[u.Team].AllowUser(u)
+	if u.Team != "" {
+		l.Channel.Children[u.Team].AllowUser(u)
+	}
 
 	// update the Channel variable
 	// so the bot allow the player
 	// to join the lobby's channel
 	l.Channel.update()
-	u.Move(l.Channel.Children[u.Team])
+	if u.Team != "" {
+		u.Move(l.Channel.Children[u.Team])
+	}
 }
 
 func (l *Lobby) DisallowPlayer(u *User) {
