@@ -98,6 +98,8 @@ func (m *Mumble) Create() {
 				// after event: "gumble.UserChangeStats"
 				e.User.Request(gumble.RequestStats)
 
+				CheckWhitelist(e.User)
+
 				removeTemporaryChannels()
 			}
 

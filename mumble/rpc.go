@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
+
+	"github.com/layeh/gumble/gumble"
 )
 
 type Fumble int
@@ -347,4 +350,88 @@ func (_ *Fumble) EndLobby(l *Lobby, reply *Lobby) error {
 
 	*reply = *l
 	return nil
+}
+
+type UserInfo struct {
+	User *User
+	Team string
+}
+
+type LobbyArgsTeam struct {
+	User  *User
+	Lobby *Lobby
+	Team  string
+}
+
+var WhitelistedUsersLock = new(sync.RWMutex)
+var WhitelistedUsers = make(map[int][]UserInfo)
+
+func (_ *Fumble) AddNameToLobbyWhitelist(l LobbyArgs, reply *NoReply) error {
+	if l.User.IsConnected() {
+		SimplyAllowUser(l.Lobby.ID, UserInfo{l.User, ""})
+		return nil
+	}
+
+	WhitelistedUsersLock.Lock()
+	defer WhitelistedUsersLock.Unlock()
+
+	if _, ok := WhitelistedUsers[l.Lobby.ID]; !ok {
+		WhitelistedUsers[l.Lobby.ID] = make([]UserInfo, 0)
+	}
+	WhitelistedUsers[l.Lobby.ID] = append(WhitelistedUsers[l.Lobby.ID], UserInfo{l.User, ""})
+	return nil
+}
+
+func (_ *Fumble) AddNameToLobbyWhitelistTeam(l LobbyArgsTeam, reply *NoReply) error {
+	if l.User.IsConnected() {
+		SimplyAllowUser(l.Lobby.ID, UserInfo{l.User, l.Team})
+		return nil
+	}
+
+	WhitelistedUsersLock.Lock()
+	defer WhitelistedUsersLock.Unlock()
+
+	if _, ok := WhitelistedUsers[l.Lobby.ID]; !ok {
+		WhitelistedUsers[l.Lobby.ID] = make([]UserInfo, 0)
+	}
+	WhitelistedUsers[l.Lobby.ID] = append(WhitelistedUsers[l.Lobby.ID], UserInfo{l.User, l.Team})
+	return nil
+}
+
+func SimplyAllowUser(lobbyId int, userInfo UserInfo) {
+	var channel *Channel
+	if userInfo.Team == "" {
+		channel = Channels[strconv.Itoa(lobbyId)]
+	} else {
+		channel = Channels[strconv.Itoa(lobbyId)+"_"+userInfo.Team]
+		Channels[channel.Parent].AllowUser(userInfo.User)
+	}
+
+	channel.AllowUser(userInfo.User)
+	userInfo.User.Move(channel)
+
+	log.Println(fmt.Sprintf("[Fumble]: Allowing User? [Lobby: %d, Name: %s]", lobbyId, userInfo.User.Name))
+}
+
+func CheckWhitelist(guser *gumble.User) {
+	WhitelistedUsersLock.Lock()
+	defer WhitelistedUsersLock.Unlock()
+
+	for lobbyId, users := range WhitelistedUsers {
+		toremove := -1
+		for i, userInfo := range users {
+			if userInfo.User.Name == guser.Name {
+				SimplyAllowUser(lobbyId, userInfo)
+
+				toremove = i
+				break
+			}
+		}
+		if toremove >= 0 {
+			users[toremove] = users[len(users)-1]
+			users = users[:len(users)-1]
+		} else {
+			log.Println(fmt.Sprintf("[Fumble]: User not in whitelist. [Lobby: %d, Name: %s]", lobbyId, guser.Name))
+		}
+	}
 }
