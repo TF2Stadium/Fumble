@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/TF2Stadium/fumble/mumble"
 	"github.com/TF2Stadium/fumble/server"
@@ -59,7 +58,7 @@ func main() {
 	m.Config = config
 	m.Create()
 
-	err = m.Connect()
+	err := m.Connect()
 	if err != nil {
 		log.Fatal(err)
 	}
