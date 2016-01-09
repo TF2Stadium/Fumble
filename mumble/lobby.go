@@ -7,7 +7,7 @@ import (
 )
 
 type Lobby struct {
-	ID   int
+	ID   uint
 	Name string
 
 	Players map[string]*User // string will be the user name
@@ -25,7 +25,7 @@ func NewLobby() *Lobby {
 // creates a channel with a child channels for each team
 // then allow players to join team's channel
 func (l *Lobby) Create() error {
-	l.Channel.Name = strconv.Itoa(l.ID)
+	l.Channel.Name = strconv.FormatUint(uint64(l.ID), 10)
 	l.Name = l.Channel.Name
 
 	// red team
