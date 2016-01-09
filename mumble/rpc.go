@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -17,8 +18,8 @@ type Args struct {
 }
 
 type LobbyArgs struct {
-	User  *User
-	Lobby *Lobby
+	User    User
+	LobbyID uint
 }
 
 type KickArgs struct {
@@ -307,38 +308,54 @@ func (_ *Fumble) KickUser(k *KickArgs, noreply *NoReply) error {
 
 /////////////
 /// LOBBY ///
-/////////////
+////////////
+var (
+	lobbyMap = make(map[uint]*Lobby)
+	mapMu    = new(sync.RWMutex)
+)
 
-func (_ *Fumble) CreateLobby(l *Lobby, reply *Lobby) error {
+func (_ *Fumble) CreateLobby(lobbyID uint, reply *struct{}) error {
+	l := &Lobby{
+		ID:      lobbyID,
+		Players: make(map[string]*User),
+		Channel: NewChannel(),
+	}
 	err := l.Create()
+
+	mapMu.Lock()
+	lobbyMap[lobbyID] = l
+	mapMu.Unlock()
 
 	if err != nil {
 		return err
 	}
 
-	*reply = *l
 	return nil
 }
 
-func (_ *Fumble) AllowPlayer(la *LobbyArgs, reply *Lobby) error {
-	la.Lobby.AllowPlayer(la.User)
+func (_ *Fumble) AllowPlayer(la *LobbyArgs, reply *struct{}) error {
+	lobby := lobbyMap[la.LobbyID]
+	lobby.AllowPlayer(&la.User)
 
-	*reply = *la.Lobby
 	return nil
 }
 
 func (_ *Fumble) DisallowPlayer(la *LobbyArgs, reply *Lobby) error {
-	la.Lobby.DisallowPlayer(la.User)
+	mapMu.RLock()
+	lobby := lobbyMap[la.LobbyID]
+	mapMu.RUnlock()
 
-	log.Println(la.Lobby.Players)
+	lobby.DisallowPlayer(&la.User)
 
-	*reply = *la.Lobby
-
-	log.Println(la.Lobby.Players)
 	return nil
 }
 
-func (_ *Fumble) EndLobby(l *Lobby, reply *Lobby) error {
+func (_ *Fumble) EndLobby(lobbyID uint, reply *Lobby) error {
+	l, ok := lobbyMap[lobbyID]
+	if !ok {
+		return nil
+	}
+
 	err := l.End()
 
 	if err != nil {
