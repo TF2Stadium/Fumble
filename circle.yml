@@ -10,15 +10,7 @@ deployment:
     branch: master
     commands:
       - mkdir binaries
-      - go build -o binaries/fumble-prod *.go
+      - go build -o -race binaries/fumble-prod *.go
       - cp binaries/fumble-prod $CIRCLE_ARTIFACTS/fumble 
       - rsync -rl -e "ssh -p $SSH_PORT" binaries/* $BACKEND_USER@tf2stadium.com:$BACKEND_DEPLOY_PATH_PROD
       - ssh -p $SSH_PORT $BACKEND_USER@tf2stadium.com $BACKEND_DEPLOY_SCRIPT_PROD
-  dev:
-    branch: dev
-    commands:
-      - mkdir binaries
-      - go build -race -o binaries/fumble-dev *.go
-      - cp binaries/fumble-dev $CIRCLE_ARTIFACTS/fumble
-      - rsync -rl -e "ssh -p $SSH_PORT" binaries/* $BACKEND_USER@tf2stadium.com:$BACKEND_DEPLOY_PATH_DEV
-      - ssh -p $SSH_PORT $BACKEND_USER@tf2stadium.com $BACKEND_DEPLOY_SCRIPT_DEV
