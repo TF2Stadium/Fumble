@@ -27,7 +27,7 @@ func main() {
 	// end: certificate
 
 	// rpc address
-	rpc_port := os.Getenv("FUMBLE_RPC_PORT")
+	rpc_port := os.Getenv("RPC_PORT")
 	if rpc_port == "" {
 		rpc_port = "7070"
 	}
