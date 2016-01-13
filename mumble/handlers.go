@@ -13,10 +13,7 @@ import (
 func onConnect(e *gumble.ConnectEvent) {
 	log.Println("[BOT]: Connected")
 
-	e.Client.Self.Request(gumble.RequestACL)
-	e.Client.Self.Request(gumble.RequestPermission)
-	e.Client.Self.Request(gumble.RequestUserList)
-
+	e.Client.Self.RequestStats()
 	// copy channels
 	for _, gc := range e.Client.Channels {
 		if gc.IsRoot() {
