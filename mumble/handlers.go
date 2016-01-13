@@ -34,7 +34,7 @@ func onConnect(e *gumble.ConnectEvent) {
 		//
 		// stats will be available
 		// after event: "UserChangeStats"
-		v.Request(gumble.RequestStats)
+		v.RequestStats()
 	}
 
 	// register bot
@@ -53,7 +53,7 @@ func onUserChange(e *gumble.UserChangeEvent, rc *gumble.Channel) {
 		// so we'll get the user's stats
 		// "e.User.Stats" will be available
 		// after event: "gumble.UserChangeStats"
-		e.User.Request(gumble.RequestStats)
+		e.User.RequestStats()
 
 		removeTemporaryChannels()
 	}
