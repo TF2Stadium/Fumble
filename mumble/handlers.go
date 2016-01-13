@@ -13,10 +13,7 @@ import (
 func onConnect(e *gumble.ConnectEvent) {
 	log.Println("[BOT]: Connected")
 
-	e.Client.Self.Request(gumble.RequestACL)
-	e.Client.Self.Request(gumble.RequestPermission)
-	e.Client.Self.Request(gumble.RequestUserList)
-
+	e.Client.Self.RequestStats()
 	// copy channels
 	for _, gc := range e.Client.Channels {
 		if gc.IsRoot() {
@@ -62,31 +59,32 @@ func onUserChange(e *gumble.UserChangeEvent, rc *gumble.Channel) {
 	}
 
 	if e.Type.Has(gumble.UserChangeDisconnected) {
-		log.Println(fmt.Sprintf("[UserChangeDisconnected]: User[Name: %s ID: %s]",
-			e.User.Name, UserIdToString(e.User.UserID)))
+		// log.Printf("[UserChangeDisconnected]: User[Name: %s ID: %s]", e.User.Name,
+		// 	UserIdToString(e.User.UserID))
 
 		removeTemporaryChannels()
 	}
 
 	if e.Type.Has(gumble.UserChangeKicked) {
-		log.Println(fmt.Sprintf("[UserChangeKicked]: User[Name: %s ID: %s Hash: %s]",
-			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash))
+		log.Printf("[UserChangeKicked]: User[Name: %s ID: %s Hash: %s]",
+			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash)
 	}
 
 	if e.Type.Has(gumble.UserChangeBanned) {
-		log.Println(fmt.Sprintf("[UserChangeBanned]: User[Name: %s ID: %s Hash: %s]",
-			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash))
+		log.Printf("[UserChangeBanned]: User[Name: %s ID: %s Hash: %s]",
+			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash)
 	}
 
 	// user change registered
 	if e.Type.Has(gumble.UserChangeRegistered) {
-		log.Println(fmt.Sprintf("[UserChangeRegistered]: User[Name: %s ID: %s Hash: %s]",
-			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash))
+		log.Printf("[UserChangeRegistered]: User[Name: %s ID: %s Hash: %s]",
+			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash)
+
 	}
 
 	if e.Type.Has(gumble.UserChangeUnregistered) {
-		log.Println(fmt.Sprintf("[UserChangeUnregistered]: User[Name: %s ID: %s Hash: %s]",
-			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash))
+		log.Printf("[UserChangeUnregistered]: User[Name: %s ID: %s Hash: %s]",
+			e.User.Name, UserIdToString(e.User.UserID), e.User.Hash)
 	}
 
 	if e.Type.Has(gumble.UserChangeName) {
