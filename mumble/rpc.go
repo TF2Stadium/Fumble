@@ -334,7 +334,13 @@ func (_ *Fumble) CreateLobby(lobbyID uint, reply *struct{}) error {
 }
 
 func (_ *Fumble) AllowPlayer(la *LobbyArgs, reply *struct{}) error {
-	lobby := lobbyMap[la.LobbyID]
+	mapMu.RLock()
+	defer mapMu.RUnlock()
+
+	lobby, ok := lobbyMap[la.LobbyID]
+	if !ok {
+		return errors.New("Server doesn't exist")
+	}
 	lobby.AllowPlayer(&la.User)
 
 	return nil
@@ -342,8 +348,12 @@ func (_ *Fumble) AllowPlayer(la *LobbyArgs, reply *struct{}) error {
 
 func (_ *Fumble) DisallowPlayer(la *LobbyArgs, reply *Lobby) error {
 	mapMu.RLock()
-	lobby := lobbyMap[la.LobbyID]
-	mapMu.RUnlock()
+	defer mapMu.RUnlock()
+
+	lobby, ok := lobbyMap[la.LobbyID]
+	if !ok {
+		return errors.New("Server doesn't exist")
+	}
 
 	lobby.DisallowPlayer(&la.User)
 
@@ -351,6 +361,9 @@ func (_ *Fumble) DisallowPlayer(la *LobbyArgs, reply *Lobby) error {
 }
 
 func (_ *Fumble) EndLobby(lobbyID uint, reply *Lobby) error {
+	mapMu.RLock()
+	defer mapMu.RUnlock()
+
 	l, ok := lobbyMap[lobbyID]
 	if !ok {
 		return nil
