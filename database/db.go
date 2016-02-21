@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/TF2Stadium/Helen/models"
 	_ "github.com/lib/pq"
 )
 
@@ -42,7 +41,7 @@ func IsAllowed(userid uint32, lobbyid uint) bool {
 func IsLobbyClosed(lobbyid uint) bool {
 	var state int
 	db.QueryRow("SELECT state FROM lobbies where id = $1", lobbyid).Scan(&state)
-	return state != int(models.LobbyStateEnded)
+	return state != 5
 }
 
 func GetSteamID(userid uint32) string {
