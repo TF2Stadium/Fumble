@@ -1,10 +1,9 @@
 machine:
   services:
-    - postgresql
     - docker
 dependencies:
   pre:
-    - sudo apt-get install opus
+    - sudo apt-get install libopus-dev
 deployment:
   master:
     branch: master
