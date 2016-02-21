@@ -1,70 +1,49 @@
 package main
 
 import (
-	"crypto/tls"
-	"fmt"
 	"log"
-	"os"
 
+	"net/http"
+	_ "net/http/pprof"
+
+	"github.com/TF2Stadium/fumble/database"
 	"github.com/TF2Stadium/fumble/mumble"
-	"github.com/TF2Stadium/fumble/server"
+	"github.com/TF2Stadium/fumble/rpc"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/layeh/gumble/gumble"
 )
 
 func main() {
-	address := os.Getenv("FUMBLE_ADDRESS")
-	username := os.Getenv("FUMBLE_USERNAME")
-	password := os.Getenv("FUMBLE_PASSWORD")
+	var config struct {
+		MumbleAddress  string `envconfig:"MUMBLE_ADDR" default:"127.0.0.1:64738"`
+		MumbleUsername string `envconfig:"MUMBLE_USERNAME" default:"Superuser"`
+		MumblePassword string `envconfig:"MUMBLE_PASSWORD" required:"true"`
 
-	// insecure
-	ins := os.Getenv("FUMBLE_INSECURE")
-	insecure := (ins == "true")
-	// end: insecure
+		DBAddr     string `envconfig:"DATABASE_ADDR" default:"127.0.0.1:5432"`
+		DBName     string `envconfig:"DATABASE_NAME" default:"tf2stadium"`
+		DBUsername string `envconfig:"DATABASE_USERNAME" default:"tf2stadium"`
+		DBPassword string `envconfig:"DATABASE_PASSWORD" default:"dickbutt"`
 
-	// certificate
-	certificateFile := os.Getenv("FUMBLE_CERTIFICATE")
-	keyFile := os.Getenv("FUMBLE_KEY")
-	// end: certificate
-
-	// rpc address
-	rpc_port := os.Getenv("RPC_PORT")
-	if rpc_port == "" {
-		rpc_port = "7070"
-	}
-	// end: rpc address
-
-	config := gumble.NewConfig()
-	config.Address = address
-	config.Username = username
-	config.Password = password
-
-	if insecure {
-		config.TLSConfig.InsecureSkipVerify = true
+		RabbitMQURL   string `envconfig:"RABBITMQ_URL" default:"amqp://guest:guest@localhost:5672/"`
+		RabbitMQQueue string `envconfig:"RABBITMQ_QUEUE" default:"fumble"`
 	}
 
-	if certificateFile != "" {
-		if keyFile == "" {
-			keyFile = certificateFile
-		}
-		if certificate, err := tls.LoadX509KeyPair(certificateFile, keyFile); err != nil {
-			fmt.Printf("%s: %s\n", os.Args[0], err)
-			os.Exit(1)
-		} else {
-			config.TLSConfig.Certificates = append(config.TLSConfig.Certificates, certificate)
-		}
-	}
-
-	m := mumble.M
-	m.Config = config
-	m.Create()
-
-	err := m.Connect()
+	log.SetFlags(log.Lshortfile)
+	err := envconfig.Process("FUMBLE", &config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// rpc server
-	server.Start(m, rpc_port)
+	database.Connect(config.DBAddr, config.DBName, config.DBUsername, config.DBPassword)
 
-	<-m.KeepAlive
+	mumbleConf := gumble.NewConfig()
+	mumbleConf.TLSConfig.InsecureSkipVerify = true
+	mumbleConf.Address = config.MumbleAddress
+	mumbleConf.Username = config.MumbleUsername
+	mumbleConf.Password = config.MumblePassword
+
+	go http.ListenAndServe(":6060", nil)
+	mumble.Connect(mumbleConf)
+
+	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQQueue)
 }
