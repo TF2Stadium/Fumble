@@ -42,10 +42,7 @@ func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	}
 }
 
-func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent) {
-	log.Println("permission denied: ", e.Permission)
-}
-
+func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent)       {}
 func (l Conn) OnTextMessage(e *gumble.TextMessageEvent)                 {}
 func (l Conn) OnUserList(e *gumble.UserListEvent)                       {}
 func (l Conn) OnACL(e *gumble.ACLEvent)                                 {}
