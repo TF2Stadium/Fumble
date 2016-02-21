@@ -2,7 +2,9 @@ machine:
   services:
     - postgresql
     - docker
-
+dependencies:
+  pre:
+    - sudo apt-get install opus
 deployment:
   master:
     branch: master
