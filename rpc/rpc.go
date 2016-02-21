@@ -17,7 +17,7 @@ func (Fumble) CreateLobby(lobbyID uint, nop *struct{}) error {
 }
 
 func (Fumble) EndLobby(lobbyID uint, nop *struct{}) error {
-	return mumble.MoveUsersToRoot(mumble.Connection, lobbyID)
+	return mumble.MoveUsersToLobbyRoot(mumble.Connection, lobbyID)
 }
 
 func StartRPC(url, event string) {
