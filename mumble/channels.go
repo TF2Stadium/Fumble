@@ -39,9 +39,9 @@ func AddLobbyChannel(l *Conn, lobbyID uint, maxplayers int) {
 	l.wait.Wait()
 }
 
-//MoveUsersToRoot moves all users from the RED and BLU channels of the given lobbyID channel
+//MoveUsersToLobbyRoot moves all users from the RED and BLU channels of the given lobbyID channel
 //to the lobby's root channel
-func MoveUsersToRoot(conn *Conn, lobbyID uint) error {
+func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 	var err error
 
 	conn.client.Do(func() {
