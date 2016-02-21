@@ -1,0 +1,12 @@
+machine:
+  services:
+    - postgresql
+    - docker
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - make docker
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - docker push tf2stadium/fumble
