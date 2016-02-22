@@ -1,6 +1,6 @@
 FROM golang:alpine
 
-RUN apk add --update opus git pkgconfig
+RUN apk add --update opus git pkgconfig opus-dev
 
 ADD . ./go/src/github.com/TF2Stadium/fumble/
 RUN go get -v github.com/TF2Stadium/fumble/...
