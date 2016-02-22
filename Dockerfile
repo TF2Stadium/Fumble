@@ -1,5 +1,9 @@
-FROM alpine
+FROM golang:alpine
 
-ADD fumble /bin/fumble
+RUN apk add --update opus git pkgconfig
 
-ENTRYPOINT /bin/fumble
+ADD . ./go/src/github.com/TF2Stadium/fumble/
+RUN go get -v github.com/TF2Stadium/fumble/...
+RUN go install -v github.com/TF2Stadium/fumble
+
+ENTRYPOINT go/bin/fumble

@@ -1,6 +1,6 @@
 static:
-	go build -ldflags "-w -linkmode external -extldflags -static" -v -o fumble
+	go build -a -tags netgo -v
 
 docker: 
-	go build -ldflags "-w -linkmode external -extldflags -static" -v -o fumble
+	go build -a -tags netgo -v -o fumble
 	docker build -t tf2stadium/fumble .

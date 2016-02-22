@@ -3,6 +3,7 @@ machine:
     - docker
 dependencies:
   pre:
+    - sudo apt-get update
     - sudo apt-get install libopus-dev
 deployment:
   master:
