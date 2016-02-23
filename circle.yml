@@ -9,6 +9,6 @@ deployment:
   master:
     branch: master
     commands:
-      - make docker
+      - docker build -t tf2stadium/fumble .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker push tf2stadium/fumble
