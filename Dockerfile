@@ -1,7 +1,7 @@
 FROM debian:latest
 
-RUN apt-get update && apt-get install libopus0 golang-go libopus-dev gcc pkg-config python3 python3-pip git libboost-all-dev libbz2-dev openssl libssl-dev -y && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update && apt-get install libopus0 golang-go libopus-dev gcc pkg-config python3 python3-pip git libbz2-dev openssl libssl-dev -y && \
+    apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN pip3 install py-postgresql
 RUN pip3 install zeroc-ice
@@ -13,5 +13,5 @@ RUN go install -v github.com/TF2Stadium/fumble
 ADD ./mumble-authenticator /mumble-authenticator/
 ADD ./entrypoint.sh /entrypoint.sh
 
-RUN ls /go/bin/
+RUN rm -rf /tmp/* /var/tmp/* /tmp/pip-build-root/* /go/src/*
 ENTRYPOINT /entrypoint.sh
