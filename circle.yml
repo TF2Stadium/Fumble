@@ -9,6 +9,8 @@ deployment:
   master:
     branch: master
     commands:
+      - git submodule init
+      - git submodule update
       - docker build -t tf2stadium/fumble .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker push tf2stadium/fumble
