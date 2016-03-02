@@ -26,6 +26,8 @@ func main() {
 
 		RabbitMQURL   string `envconfig:"RABBITMQ_URL" default:"amqp://guest:guest@localhost:5672/"`
 		RabbitMQQueue string `envconfig:"RABBITMQ_QUEUE" default:"fumble"`
+
+		ProfilerAddr string `envconfig:"PROFILER_ADDR"`
 	}
 
 	log.SetFlags(log.Lshortfile)
@@ -42,7 +44,11 @@ func main() {
 	mumbleConf.Username = config.MumbleUsername
 	mumbleConf.Password = config.MumblePassword
 
-	go http.ListenAndServe(":6060", nil)
+	if config.ProfilerAddr != "" {
+		go func() {
+			log.Println(http.ListenAndServe(config.ProfilerAddr, nil))
+		}()
+	}
 	mumble.Connect(mumbleConf)
 
 	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQQueue)
