@@ -1,5 +1,6 @@
 #!/bin/sh
 
-/mumble-authenticator/env.sh
-python3 /mumble-authenticator/auth.py &
+cd /mumble-authenticator/
+./env.sh
+python3 auth.py &
 /go/bin/fumble
