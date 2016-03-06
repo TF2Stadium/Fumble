@@ -52,13 +52,20 @@ func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 			return
 		}
 
+		totalUsers := 0
 		for _, channel := range root.Children {
 			for _, user := range channel.Users {
 				user.Move(channel.Parent) // move to root lobby channel, but use channel.Parent
+				totalUsers++
 			}
 
 			conn.wait.Add(1)
 			channel.Remove()
+		}
+
+		if totalUsers == 0 { // no users in channels, remove it entirely
+			conn.wait.Add(1)
+			root.Remove()
 		}
 		return
 	})
@@ -69,14 +76,12 @@ func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 
 func getLobbyID(channel *gumble.Channel) uint {
 	name := channel.Name
-	switch name[0] {
-	case 'L': // name is "Lobby #<id>"
-		id, _ := strconv.ParseUint(name[strings.Index(name, "#")+1:], 10, 32)
-		return uint(id)
-	default: // RED or blu
-		return getLobbyID(channel.Parent)
-
+	if name[0] != 'L' { // channel name is either "RED" or "BLU"
+		name = channel.Parent.Name
 	}
+
+	id, _ := strconv.ParseUint(name[strings.Index(name, "#")+1:], 10, 32)
+	return uint(id)
 }
 
 func isUserAllowed(user *gumble.User, channel *gumble.Channel) bool {
