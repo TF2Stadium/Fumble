@@ -13,5 +13,5 @@ RUN go install -v github.com/TF2Stadium/fumble
 ADD ./mumble-authenticator /mumble-authenticator/
 ADD ./entrypoint.sh /entrypoint.sh
 
-RUN rm -rf /tmp/* /var/tmp/* /tmp/pip-build-root/* /go/src/* && apt-get remove golang-go gcc -y && apt-get purge
+RUN rm -rf /tmp/* /var/tmp/* /tmp/pip-build-root/* /go/src/* && apt-get remove golang-go gcc -y && apt-get purge && apt-get autoremove -y
 ENTRYPOINT /entrypoint.sh
