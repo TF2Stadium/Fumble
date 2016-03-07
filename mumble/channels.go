@@ -54,16 +54,13 @@ func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 
 		totalUsers := 0
 		for _, channel := range root.Children {
-			for _, user := range channel.Users {
-				user.Move(channel.Parent) // move to root lobby channel, but use channel.Parent
-				totalUsers++
-			}
+			totalUsers += len(channel.Users)
 
 			conn.wait.Add(1)
 			channel.Remove()
 		}
 
-		if totalUsers == 0 { // no users in channels, remove it entirely
+		if totalUsers == 0 { // no users in both channels, remove it entirely
 			conn.wait.Add(1)
 			root.Remove()
 		}
