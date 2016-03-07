@@ -24,8 +24,9 @@ func main() {
 		DBUsername string `envconfig:"DATABASE_USERNAME" default:"tf2stadium"`
 		DBPassword string `envconfig:"DATABASE_PASSWORD" default:"dickbutt"`
 
-		RabbitMQURL   string `envconfig:"RABBITMQ_URL" default:"amqp://guest:guest@localhost:5672/"`
-		RabbitMQQueue string `envconfig:"RABBITMQ_QUEUE" default:"fumble"`
+		RabbitMQURL        string `envconfig:"RABBITMQ_URL" default:"amqp://guest:guest@localhost:5672/"`
+		RabbitMQEventQueue string `envconfig:"RABBITMQ_EVENT_QUEUE" default:"events"`
+		RabbitMQRPCQueue   string `envconfig:"RABBITMQ_RPC_QUEUE" default:"fumble"`
 
 		ProfilerAddr string `envconfig:"PROFILER_ADDR"`
 	}
@@ -51,5 +52,5 @@ func main() {
 	}
 	mumble.Connect(mumbleConf)
 
-	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQQueue)
+	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQRPCQueue)
 }
