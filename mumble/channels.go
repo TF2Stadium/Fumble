@@ -88,7 +88,7 @@ func isUserAllowed(user *gumble.User, channel *gumble.Channel) bool {
 
 	lobbyID := getLobbyID(channel)
 
-	return database.IsAllowed(user.UserID, lobbyID)
+	return database.IsAllowed(user.UserID, lobbyID, channel.Name)
 }
 
 func (conn Conn) removeEmptyChannels() {

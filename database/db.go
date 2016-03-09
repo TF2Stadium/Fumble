@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/TF2Stadium/Helen/models"
 	_ "github.com/lib/pq"
 )
 
@@ -31,11 +32,21 @@ func Connect(dburl, database, username, password string) {
 	}
 }
 
-func IsAllowed(userid uint32, lobbyid uint) bool {
-	var state int
-	db.QueryRow("SELECT state FROM player_slots WHERE id = $1 AND lobby_id = $2", userid, lobbyid).Scan(&state)
+func IsAllowed(userid uint32, lobbyid uint, channelname string) bool {
+	var lobbyType, slot int
+	db.QueryRow("SELECT type FROM lobbies WHERE id = $1", lobbyid).Scan(&lobbyType)
+	err := db.QueryRow("SELECT slot FROM lobby_slots WHERE player_id = $1 AND lobby_id = $2", userid, lobbyid).Scan(&slot)
+	if err != nil {
+		return false
+	}
 
-	return state != 0
+	if channelname[0] == 'L' { // channel name is "Lobby..."
+		return true
+	}
+
+	//channel name is either "RED" or "BLU"
+	team, _, _ := models.LobbyGetSlotInfoString(models.LobbyType(lobbyType), slot)
+	return team == channelname
 }
 
 func IsLobbyClosed(lobbyid uint) bool {
