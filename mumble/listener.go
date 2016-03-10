@@ -5,7 +5,6 @@ import (
 
 	"github.com/TF2Stadium/fumble/database"
 	"github.com/layeh/gumble/gumble"
-	_ "github.com/layeh/gumble/opus"
 )
 
 func (l Conn) OnConnect(e *gumble.ConnectEvent) {
