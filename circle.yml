@@ -4,20 +4,23 @@ machine:
 dependencies:
   pre:
     - sudo apt-get update
-    - sudo apt-get install libopus-dev
+    - sudo apt-get install libopus-dev libopus0
 deployment:
   master:
     branch: master
     commands:
       - git submodule init
       - git submodule update
+      - make static
       - docker build -t tf2stadium/fumble:latest .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker push tf2stadium/fumble:latest
+  dev:
     branch: dev
     commands:
       - git submodule init
       - git submodule update
+      - make static
       - docker build -t tf2stadium/fumble:dev .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker push tf2stadium/fumble:dev
