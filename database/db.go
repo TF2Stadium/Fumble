@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/url"
+	"strings"
 
 	"github.com/TF2Stadium/Helen/models"
 	_ "github.com/lib/pq"
@@ -46,7 +47,7 @@ func IsAllowed(userid uint32, lobbyid uint, channelname string) bool {
 
 	//channel name is either "RED" or "BLU"
 	team, _, _ := models.LobbyGetSlotInfoString(models.LobbyType(lobbyType), slot)
-	return team == channelname
+	return team == strings.ToLower(channelname)
 }
 
 func IsLobbyClosed(lobbyid uint) bool {
