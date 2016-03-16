@@ -81,9 +81,9 @@ func getLobbyID(channel *gumble.Channel) uint {
 	return uint(id)
 }
 
-func isUserAllowed(user *gumble.User, channel *gumble.Channel) bool {
+func isUserAllowed(user *gumble.User, channel *gumble.Channel) (bool, string) {
 	if channel.IsRoot() {
-		return true
+		return true, ""
 	}
 
 	lobbyID := getLobbyID(channel)
