@@ -16,7 +16,7 @@ import (
 func main() {
 	var config struct {
 		MumbleAddress  string `envconfig:"MUMBLE_ADDR" default:"127.0.0.1:64738"`
-		MumbleUsername string `envconfig:"MUMBLE_USERNAME" default:"Superuser"`
+		MumbleUsername string `envconfig:"MUMBLE_USERNAME" default:"SuperUser"`
 		MumblePassword string `envconfig:"MUMBLE_PASSWORD" required:"true"`
 
 		DBAddr     string `envconfig:"DATABASE_ADDR" default:"127.0.0.1:5432"`
