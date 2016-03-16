@@ -19,7 +19,8 @@ func (l Conn) OnDisconnect(e *gumble.DisconnectEvent) {
 func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 	l.client.Do(func() {
 		if e.Type.Has(gumble.UserChangeChannel) {
-			if !isUserAllowed(e.User, e.User.Channel) {
+			if allowed, reason := isUserAllowed(e.User, e.User.Channel); !allowed {
+				e.User.Send(reason)
 				e.User.Move(e.Client.Channels[0])
 			}
 
