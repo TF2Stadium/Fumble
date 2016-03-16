@@ -33,21 +33,32 @@ func Connect(dburl, database, username, password string) {
 	}
 }
 
-func IsAllowed(userid uint32, lobbyid uint, channelname string) bool {
+func IsAllowed(userid uint32, lobbyid uint, channelname string) (bool, string) {
 	var lobbyType, slot int
 	db.QueryRow("SELECT type FROM lobbies WHERE id = $1", lobbyid).Scan(&lobbyType)
 	err := db.QueryRow("SELECT slot FROM lobby_slots WHERE player_id = $1 AND lobby_id = $2", userid, lobbyid).Scan(&slot)
-	if err != nil {
-		return false
+	if err == sql.ErrNoRows {
+		return false, "You're not in this lobby"
+	} else if err != nil {
+		log.Println(err)
+		return false, "Internal fumble error"
 	}
 
 	if channelname[0] == 'L' { // channel name is "Lobby..."
-		return true
+		return true, ""
 	}
 
 	//channel name is either "RED" or "BLU"
-	team, _, _ := models.LobbyGetSlotInfoString(models.LobbyType(lobbyType), slot)
-	return team == strings.ToLower(channelname)
+	team, _, err := models.LobbyGetSlotInfoString(models.LobbyType(lobbyType), slot)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if team != strings.ToLower(channelname) {
+		return false, "You're in team " + strings.ToUpper(team) + ", not " + channelname
+	}
+
+	return true, ""
 }
 
 func IsLobbyClosed(lobbyid uint) bool {
