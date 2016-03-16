@@ -1,0 +1,12 @@
+package: github.com/TF2Stadium/fumble
+import:
+- package: github.com/TF2Stadium/Helen
+  subpackages:
+  - models
+- package: github.com/kelseyhightower/envconfig
+- package: github.com/layeh/gumble
+  subpackages:
+  - gumble
+- package: github.com/lib/pq
+- package: github.com/streadway/amqp
+- package: github.com/vibhavp/amqp-rpc
