@@ -26,16 +26,20 @@ func AddLobbyChannel(l *Conn, lobbyID uint, maxplayers int) {
 	l.client.Do(func() { l.client.Channels[0].Add(name, false) })
 	l.wait.Wait()
 
+	log.Printf("#%d: Created root", lobbyID)
+
 	l.client.Do(func() {
 		channel := l.client.Channels[0].Find(name)
 		channel.SetDescription("Mumble channel for TF2Stadium " + name)
 		channel.SetMaxUsers(uint32(maxplayers))
 
 		l.wait.Add(2)
+		log.Printf("#%d: Creating RED and BLU", lobbyID)
 		channel.Add("RED", false)
 		channel.Add("BLU", false)
 	})
 
+	log.Printf("#%d: Done", lobbyID)
 	l.wait.Wait()
 }
 
@@ -43,9 +47,9 @@ func AddLobbyChannel(l *Conn, lobbyID uint, maxplayers int) {
 //to the lobby's root channel
 func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 	var err error
+	name := fmt.Sprintf("Lobby #%d", lobbyID)
 
 	conn.client.Do(func() {
-		name := fmt.Sprintf("Lobby #%d", lobbyID)
 		root := conn.client.Channels[0].Find(name) // root lobby channel
 		if root == nil {
 			err = ErrChanNotFound
@@ -67,6 +71,7 @@ func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 		return
 	})
 
+	log.Printf("#%d: Deleted channels", lobbyID)
 	conn.wait.Wait()
 	return err
 }
