@@ -71,9 +71,13 @@ func MoveUsersToLobbyRoot(conn *Conn, lobbyID uint) error {
 		return
 	})
 
+	if err != nil {
+		return err
+	}
+
 	log.Printf("#%d: Deleted channels", lobbyID)
 	conn.wait.Wait()
-	return err
+	return nil
 }
 
 func getLobbyID(channel *gumble.Channel) uint {
