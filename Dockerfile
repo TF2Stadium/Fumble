@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install libopus0 libopus-dev  pkg-config python3 p
 RUN pip3 install py-postgresql
 RUN pip3 install zeroc-ice
 
+ENV FUMBLE_PROFILER_ADDR=0.0.0.0:80
 ENV GOPATH=/go
 ADD . ./go/src/github.com/TF2Stadium/fumble/
 RUN go get -v github.com/TF2Stadium/fumble/...
