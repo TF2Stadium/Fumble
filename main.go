@@ -49,8 +49,9 @@ func main() {
 		go func() {
 			log.Println(http.ListenAndServe(config.ProfilerAddr, nil))
 		}()
+		log.Printf("Running profiler at %s", config.ProfilerAddr)
 	}
-	mumble.Connect(mumbleConf)
 
+	mumble.Connect(mumbleConf)
 	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQRPCQueue)
 }
