@@ -2,10 +2,13 @@ package mumble
 
 import (
 	"log"
+	"sync/atomic"
 
 	"github.com/TF2Stadium/fumble/database"
 	"github.com/layeh/gumble/gumble"
 )
+
+var channels = new(uint64)
 
 func (l Conn) OnConnect(e *gumble.ConnectEvent) {
 	log.Println("Connected to Mumble!")
@@ -24,7 +27,9 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.Move(e.Client.Channels[0])
 			}
 
-			go l.removeEmptyChannels()
+			if atomic.LoadUint64(channels) == 30 {
+				go l.removeEmptyChannels()
+			}
 		}
 		if e.Type.Has(gumble.UserChangeConnected) {
 			steamid := database.GetSteamID(e.User.UserID)
@@ -37,8 +42,10 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	if e.Type.Has(gumble.ChannelChangeCreated) {
 		l.wait.Done()
+		atomic.AddUint64(channels, 1)
 	} else if e.Type.Has(gumble.ChannelChangeRemoved) {
 		l.wait.Done()
+		atomic.AddUint64(channels, ^uint64(0))
 	}
 }
 
