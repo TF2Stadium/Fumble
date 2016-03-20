@@ -61,12 +61,6 @@ func IsAllowed(userid uint32, lobbyid uint, channelname string) (bool, string) {
 	return true, ""
 }
 
-func IsLobbyClosed(lobbyid uint) bool {
-	var state int
-	db.QueryRow("SELECT state FROM lobbies where id = $1", lobbyid).Scan(&state)
-	return state != 5
-}
-
 func GetSteamID(userid uint32) string {
 	var steamid string
 	db.QueryRow("SELECT steam_id FROM players WHERE id = $1", userid).Scan(&steamid)
