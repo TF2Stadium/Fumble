@@ -30,7 +30,7 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 			if allowed, reason := isUserAllowed(e.User, e.User.Channel); !allowed {
 				e.User.Send(reason)
 				e.User.Move(e.Client.Channels[0])
-			} else {
+			} else if !e.User.Channel.IsRoot() {
 				e.User.SetDeafened(false)
 				e.User.SetMuted(false)
 			}
