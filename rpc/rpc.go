@@ -12,12 +12,13 @@ import (
 type Fumble struct{}
 
 func (Fumble) CreateLobby(lobbyID uint, nop *struct{}) error {
-	mumble.AddLobbyChannel(mumble.Connection, lobbyID, 18)
+	mumble.Connection.Create <- lobbyID
 	return nil
 }
 
 func (Fumble) EndLobby(lobbyID uint, nop *struct{}) error {
-	return mumble.MoveUsersToLobbyRoot(mumble.Connection, lobbyID)
+	mumble.Connection.Remove <- lobbyID
+	return nil
 }
 
 func StartRPC(url, event string) {
