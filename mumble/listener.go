@@ -39,10 +39,6 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.SetDeafened(false)
 				e.User.SetMuted(false)
 			}
-
-			if len(e.Client.Channels) > 10 {
-				go l.removeEmptyChannels()
-			}
 		}
 		if e.Type.Has(gumble.UserChangeConnected) {
 			if !e.User.IsRegistered() {
