@@ -1,10 +1,9 @@
 FROM golang:latest
 
-RUN apt-get update && apt-get install libopus0 libopus-dev  pkg-config python3 python3-pip git libbz2-dev openssl libssl-dev -y && \
+RUN apt-get update && apt-get install libopus0 libopus-dev  pkg-config python3 python3-pip git libbz2-dev openssl libssl-dev python3-zeroc-ice -y && \
     apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN pip3 install py-postgresql
-RUN pip3 install zeroc-ice
 
 ENV FUMBLE_PROFILER_ADDR=0.0.0.0:80
 ENV GOPATH=/go
