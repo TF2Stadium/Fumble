@@ -27,6 +27,14 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.SetMuted(true)
 			}
 
+			if !e.User.IsRegistered() {
+				// this shouldn't happen, the mumble authenticator
+				// is down, so we'll let users join channel by themselves
+				e.User.SetDeafened(false)
+				e.User.SetMuted(false)
+				return
+			}
+
 			if allowed, reason := isUserAllowed(e.User, e.User.Channel); !allowed {
 				e.User.Send(reason)
 				e.User.Move(e.Client.Channels[0])
@@ -40,6 +48,9 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 			}
 		}
 		if e.Type.Has(gumble.UserChangeConnected) {
+			if !e.User.IsRegistered() {
+				e.User.Send("The mumble authentication service is down, please contact admins.")
+			}
 			e.User.Send("Welcome to TF2Stadium!")
 			e.User.SetDeafened(true)
 			e.User.SetMuted(true)
