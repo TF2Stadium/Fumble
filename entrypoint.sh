@@ -2,5 +2,4 @@
 
 cd /mumble-authenticator/
 ./env.sh
-python3 auth.py &
-/go/bin/fumble
+{ python3 auth.py & /go/bin/fumble; }
