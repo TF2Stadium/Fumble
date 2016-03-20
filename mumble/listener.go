@@ -22,9 +22,17 @@ func (l Conn) OnDisconnect(e *gumble.DisconnectEvent) {
 func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 	l.client.Do(func() {
 		if e.Type.Has(gumble.UserChangeChannel) {
+			if e.User.Channel.ID == 0 { // is root
+				e.User.SetDeafened(true)
+				e.User.SetMuted(true)
+			}
+
 			if allowed, reason := isUserAllowed(e.User, e.User.Channel); !allowed {
 				e.User.Send(reason)
 				e.User.Move(e.Client.Channels[0])
+			} else {
+				e.User.SetDeafened(false)
+				e.User.SetMuted(false)
 			}
 
 			if atomic.LoadUint64(channels) == 30 {
@@ -32,9 +40,9 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 			}
 		}
 		if e.Type.Has(gumble.UserChangeConnected) {
-			steamid := database.GetSteamID(e.User.UserID)
-			e.User.SetComment("http://steamcommunity.com/profiles/" + steamid)
 			e.User.Send("Welcome to TF2Stadium!")
+			e.User.SetDeafened(true)
+			e.User.SetMuted(true)
 		}
 	})
 }
@@ -49,10 +57,10 @@ func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	}
 }
 
-func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent)       {}
-func (l Conn) OnTextMessage(e *gumble.TextMessageEvent)                 {}
-func (l Conn) OnUserList(e *gumble.UserListEvent)                       {}
-func (l Conn) OnACL(e *gumble.ACLEvent)                                 {}
-func (l Conn) OnBanList(e *gumble.BanListEvent)                         {}
-func (l Conn) OnContextActionChange(e *gumble.ContextActionChangeEvent) {}
-func (l Conn) OnServerConfig(e *gumble.ServerConfigEvent)               {}
+// func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent)       {}
+// func (l Conn) OnTextMessage(e *gumble.TextMessageEvent)                 {}
+// func (l Conn) OnUserList(e *gumble.UserListEvent)                       {}
+// func (l Conn) OnACL(e *gumble.ACLEvent)                                 {}
+// func (l Conn) OnBanList(e *gumble.BanListEvent)                         {}
+// func (l Conn) OnContextActionChange(e *gumble.ContextActionChangeEvent) {}
+// func (l Conn) OnServerConfig(e *gumble.ServerConfigEvent)               {}
