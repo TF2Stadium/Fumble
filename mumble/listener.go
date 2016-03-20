@@ -4,11 +4,8 @@ import (
 	"log"
 	"sync/atomic"
 
-	"github.com/TF2Stadium/fumble/database"
 	"github.com/layeh/gumble/gumble"
 )
-
-var channels = new(uint64)
 
 func (l Conn) OnConnect(e *gumble.ConnectEvent) {
 	log.Println("Connected to Mumble!")
@@ -30,6 +27,7 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 			if !e.User.IsRegistered() {
 				// this shouldn't happen, the mumble authenticator
 				// is down, so we'll let users join channel by themselves
+				e.User.Send("The mumble authentication service is down, please contact admins, or try reconnecting.")
 				e.User.SetDeafened(false)
 				e.User.SetMuted(false)
 				return
@@ -43,13 +41,13 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.SetMuted(false)
 			}
 
-			if atomic.LoadUint64(channels) == 30 {
+			if len(e.Client.Channels) > 10 {
 				go l.removeEmptyChannels()
 			}
 		}
 		if e.Type.Has(gumble.UserChangeConnected) {
 			if !e.User.IsRegistered() {
-				e.User.Send("The mumble authentication service is down, please contact admins.")
+				e.User.Send("The mumble authentication service is down, please contact admins, or try reconnecting.")
 			}
 			e.User.Send("Welcome to TF2Stadium!")
 			e.User.SetDeafened(true)
@@ -61,10 +59,8 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	if e.Type.Has(gumble.ChannelChangeCreated) {
 		l.wait.Done()
-		atomic.AddUint64(channels, 1)
 	} else if e.Type.Has(gumble.ChannelChangeRemoved) {
 		l.wait.Done()
-		atomic.AddUint64(channels, ^uint64(0))
 	}
 }
 
