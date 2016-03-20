@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/TF2Stadium/fumble/database"
 	"github.com/layeh/gumble/gumble"
@@ -61,6 +62,20 @@ func channelManage(conn *Conn) {
 				if totalUsers == 0 { // no users in both channels, remove it entirely
 					conn.wait.Add(1)
 					root.Remove()
+				} else {
+					root.Send("Removing channel after 10 minutes", false)
+					time.AfterFunc(10*time.Minute, func() {
+						conn.client.Do(func() {
+							root := conn.client.Channels[0].Find(name)
+							if root == nil {
+								log.Printf("Couldn't find channel `%s`", name)
+								return
+							}
+							conn.wait.Add(1)
+							root.Remove()
+						})
+						conn.wait.Wait()
+					})
 				}
 				return
 			})
@@ -88,17 +103,4 @@ func isUserAllowed(user *gumble.User, channel *gumble.Channel) (bool, string) {
 	lobbyID := getLobbyID(channel)
 
 	return database.IsAllowed(user.UserID, lobbyID, channel.Name)
-}
-
-func (conn Conn) removeEmptyChannels() {
-	conn.client.Do(func() {
-		for _, c := range conn.client.Channels {
-			if len(c.Users) == 0 && !database.IsLobbyClosed(getLobbyID(c)) {
-				conn.wait.Add(1)
-				c.Remove()
-			}
-		}
-	})
-
-	conn.wait.Wait()
 }
