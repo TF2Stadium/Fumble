@@ -2,7 +2,6 @@ package mumble
 
 import (
 	"log"
-	"sync/atomic"
 
 	"github.com/layeh/gumble/gumble"
 )
@@ -64,10 +63,10 @@ func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
 	}
 }
 
-// func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent)       {}
-// func (l Conn) OnTextMessage(e *gumble.TextMessageEvent)                 {}
-// func (l Conn) OnUserList(e *gumble.UserListEvent)                       {}
-// func (l Conn) OnACL(e *gumble.ACLEvent)                                 {}
-// func (l Conn) OnBanList(e *gumble.BanListEvent)                         {}
-// func (l Conn) OnContextActionChange(e *gumble.ContextActionChangeEvent) {}
-// func (l Conn) OnServerConfig(e *gumble.ServerConfigEvent)               {}
+func (l Conn) OnPermissionDenied(e *gumble.PermissionDeniedEvent)       {}
+func (l Conn) OnTextMessage(e *gumble.TextMessageEvent)                 {}
+func (l Conn) OnUserList(e *gumble.UserListEvent)                       {}
+func (l Conn) OnACL(e *gumble.ACLEvent)                                 {}
+func (l Conn) OnBanList(e *gumble.BanListEvent)                         {}
+func (l Conn) OnContextActionChange(e *gumble.ContextActionChangeEvent) {}
+func (l Conn) OnServerConfig(e *gumble.ServerConfigEvent)               {}
