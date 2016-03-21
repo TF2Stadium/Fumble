@@ -18,11 +18,6 @@ func (l Conn) OnDisconnect(e *gumble.DisconnectEvent) {
 func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 	l.client.Do(func() {
 		if e.Type.Has(gumble.UserChangeChannel) {
-			if e.User.Channel.ID == 0 { // is root
-				e.User.SetDeafened(true)
-				e.User.SetMuted(true)
-			}
-
 			if !e.User.IsRegistered() {
 				// this shouldn't happen, the mumble authenticator
 				// is down, so we'll let users join channel by themselves
