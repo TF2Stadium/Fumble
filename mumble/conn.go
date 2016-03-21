@@ -34,5 +34,9 @@ func Connect(config *gumble.Config) {
 	go channelManage(Connection)
 	client.Attach(Connection)
 	Connection.wait.Wait()
-
+	Connection.client.Do(func() {
+		Connection.wait.Add(1)
+		Connection.client.Channels[0].Add(ffaChannel, false)
+	})
+	Connection.wait.Wait()
 }
