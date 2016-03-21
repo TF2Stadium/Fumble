@@ -12,7 +12,10 @@ import (
 	"github.com/layeh/gumble/gumble"
 )
 
-var ErrChanNotFound = errors.New("channel not found")
+var (
+	ErrChanNotFound = errors.New("channel not found")
+	ffaChannel      = "Fast Bomb and Chill"
+)
 
 func printchannels(c gumble.Channels) {
 	for _, channel := range c {
@@ -96,7 +99,7 @@ func getLobbyID(channel *gumble.Channel) uint {
 }
 
 func isUserAllowed(user *gumble.User, channel *gumble.Channel) (bool, string) {
-	if channel.IsRoot() {
+	if channel.IsRoot() || channel.Name == ffaChannel {
 		return true, ""
 	}
 
