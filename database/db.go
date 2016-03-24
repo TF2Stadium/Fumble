@@ -61,6 +61,16 @@ func IsAllowed(userid uint32, lobbyid uint, channelname string) (bool, string) {
 	return true, ""
 }
 
+func IsAdmin(userid uint32) bool {
+	var role int
+	err := db.QueryRow("SELECT role FROM players WHERE id = $1", userid).Scan(&role)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return role == 1 || role == 2 || role == 3
+}
+
 func GetSteamID(userid uint32) string {
 	var steamid string
 	db.QueryRow("SELECT steam_id FROM players WHERE id = $1", userid).Scan(&steamid)

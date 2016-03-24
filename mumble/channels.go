@@ -96,7 +96,7 @@ func getLobbyID(channel *gumble.Channel) uint {
 }
 
 func isUserAllowed(user *gumble.User, channel *gumble.Channel) (bool, string) {
-	if channel.IsRoot() {
+	if channel.IsRoot() || database.IsAdmin(userid) {
 		return true, ""
 	}
 
