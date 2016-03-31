@@ -8,7 +8,6 @@ import (
 
 func (l Conn) OnConnect(e *gumble.ConnectEvent) {
 	log.Println("Connected to Mumble!")
-	l.wait.Done()
 }
 
 func (l Conn) OnDisconnect(e *gumble.DisconnectEvent) {
@@ -42,10 +41,9 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 }
 
 func (l Conn) OnChannelChange(e *gumble.ChannelChangeEvent) {
-	if e.Type.Has(gumble.ChannelChangeCreated) {
-		l.wait.Done()
-	} else if e.Type.Has(gumble.ChannelChangeRemoved) {
-		l.wait.Done()
+	if e.Type.Has(gumble.ChannelChangeCreated) && e.Channel.Name[0] == 'L' {
+		//channel name is "Lobby #..."
+		l.lobbyRootWait.Done()
 	}
 }
 

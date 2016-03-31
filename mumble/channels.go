@@ -29,20 +29,18 @@ func channelManage(conn *Conn) {
 		case lobbyID := <-conn.Create:
 			name := fmt.Sprintf("Lobby #%d", lobbyID)
 
-			conn.wait.Add(1)
+			conn.lobbyRootWait.Add(1)
 			conn.client.Do(func() { conn.client.Channels[0].Add(name, false) })
-			conn.wait.Wait()
+			conn.lobbyRootWait.Wait()
 
 			conn.client.Do(func() {
 				channel := conn.client.Channels[0].Find(name)
 				channel.SetDescription("Mumble channel for TF2Stadium " + name)
 
-				conn.wait.Add(2)
 				log.Printf("#%d: Creating RED and BLU", lobbyID)
 				channel.Add("RED", false)
 				channel.Add("BLU", false)
 			})
-			conn.wait.Wait()
 			log.Printf("#%d: Done", lobbyID)
 		case lobbyID := <-conn.Remove:
 			name := fmt.Sprintf("Lobby #%d", lobbyID)
@@ -58,12 +56,10 @@ func channelManage(conn *Conn) {
 				for _, channel := range root.Children {
 					totalUsers += len(channel.Users)
 
-					conn.wait.Add(1)
 					channel.Remove()
 				}
 
 				if totalUsers == 0 { // no users in both channels, remove it entirely
-					conn.wait.Add(1)
 					root.Remove()
 				} else {
 					root.Send("Removing channel after 10 minutes", false)
@@ -74,15 +70,12 @@ func channelManage(conn *Conn) {
 								log.Printf("Couldn't find channel `%s`", name)
 								return
 							}
-							conn.wait.Add(1)
 							root.Remove()
 						})
-						conn.wait.Wait()
 					})
 				}
 				return
 			})
-			conn.wait.Wait()
 			log.Printf("#%d: Deleted channels", lobbyID)
 		}
 	}
