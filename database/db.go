@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/TF2Stadium/Helen/models"
+	"github.com/TF2Stadium/Helen/models/lobby/format"
 	_ "github.com/lib/pq"
 )
 
@@ -49,7 +49,7 @@ func IsAllowed(userid uint32, lobbyid uint, channelname string) (bool, string) {
 	}
 
 	//channel name is either "RED" or "BLU"
-	team, _, err := models.LobbyGetSlotInfoString(models.LobbyType(lobbyType), slot)
+	team, _, err := format.GetSlotTeamClass(format.Format(lobbyType), slot)
 	if err != nil {
 		log.Println(err)
 	}
