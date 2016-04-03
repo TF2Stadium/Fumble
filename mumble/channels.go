@@ -83,7 +83,7 @@ func channelManage(conn *Conn) {
 
 func getLobbyID(channel *gumble.Channel) uint {
 	name := channel.Name
-	if name[0] != 'L' { // channel name is either "RED" or "BLU"
+	if !strings.HasPrefix(channel.Name, "Lobby") { // channel name is either "RED" or "BLU"
 		name = channel.Parent.Name
 	}
 

@@ -21,13 +21,13 @@ func (Fumble) EndLobby(lobbyID uint, nop *struct{}) error {
 	return nil
 }
 
-func StartRPC(url, event string) {
+func StartRPC(url, queue string) {
 	rpc.Register(new(Fumble))
 	conn, err := amqp.Dial(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	serverCodec, err := amqprpc.NewServerCodec(conn, event, amqprpc.JSONCodec{})
+	serverCodec, err := amqprpc.NewServerCodec(conn, queue, amqprpc.JSONCodec{})
 	rpc.ServeCodec(serverCodec)
 }

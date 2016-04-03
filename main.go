@@ -52,6 +52,6 @@ func main() {
 		log.Printf("Running profiler at %s", config.ProfilerAddr)
 	}
 
-	mumble.Connect(mumbleConf)
+	mumble.Connect(mumbleConf, config.RabbitMQURL, config.RabbitMQEventQueue)
 	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQRPCQueue)
 }
