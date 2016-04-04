@@ -21,6 +21,11 @@ func (Fumble) EndLobby(lobbyID uint, nop *struct{}) error {
 	return nil
 }
 
+func (Fumble) RemovePlayer(playerID uint, _ *struct{}) error {
+	mumble.Connection.RemoveUser <- playerID
+	return nil
+}
+
 func StartRPC(url, queue string) {
 	rpc.Register(new(Fumble))
 	conn, err := amqp.Dial(url)

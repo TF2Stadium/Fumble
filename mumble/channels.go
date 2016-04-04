@@ -77,6 +77,14 @@ func channelManage(conn *Conn) {
 				return
 			})
 			log.Printf("#%d: Deleted channels", lobbyID)
+		case userID := <-conn.RemoveUser:
+			conn.client.Do(func() {
+				for _, user := range conn.client.Users {
+					if user.Channel.ID != 0 && user.UserID == uint32(userID) {
+						user.Move(conn.client.Channels[0])
+					}
+				}
+			})
 		}
 	}
 }
