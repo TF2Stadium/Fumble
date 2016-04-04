@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/TF2Stadium/Helen/helpers"
+	"github.com/TF2Stadium/Helen/helpers/authority"
 	"github.com/TF2Stadium/Helen/models/lobby/format"
 	_ "github.com/lib/pq"
 )
@@ -65,4 +67,14 @@ func GetSteamID(userid uint32) string {
 	var steamid string
 	db.QueryRow("SELECT steam_id FROM players WHERE id = $1", userid).Scan(&steamid)
 	return steamid
+}
+
+func IsAdmin(userid uint32) bool {
+	var role authority.AuthRole
+	err := db.QueryRow("SELECT role FROM players WHERE id = $1", userid).Scan(&role)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return role == helpers.RoleAdmin || role == helpers.RoleMod
 }

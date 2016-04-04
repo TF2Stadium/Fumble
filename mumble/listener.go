@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/TF2Stadium/Helen/models/event"
+	"github.com/TF2Stadium/fumble/database"
 	"github.com/layeh/gumble/gumble"
 	"github.com/streadway/amqp"
 )
@@ -26,8 +27,9 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				// this shouldn't happen, the mumble authenticator
 				// is down, so we'll let users join channel by themselves
 				e.User.Send("The mumble authentication service is down, please contact admins, or try reconnecting.")
-				e.User.SetDeafened(false)
-				e.User.SetMuted(false)
+				return
+			}
+			if database.IsAdmin(e.User.UserID) {
 				return
 			}
 
