@@ -2,6 +2,7 @@ package mumble
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 
@@ -10,6 +11,23 @@ import (
 	"github.com/layeh/gumble/gumble"
 	"github.com/streadway/amqp"
 )
+
+func moveUserToLobbyChannel(client *gumble.Client, user *gumble.User, lobbyID uint, team string) {
+	name := fmt.Sprintf("Lobby #%d", lobbyID)
+	channel := client.Channels[0].Find(name)
+	if channel == nil {
+		log.Printf("Couldn't find channel %s", name)
+		return
+	}
+
+	teamChannel := channel.Find(strings.ToUpper(team))
+	if teamChannel == nil {
+		log.Printf("Couldn't find channel %s in %s", team, name)
+		return
+	}
+
+	user.Move(teamChannel)
+}
 
 func (l Conn) OnConnect(e *gumble.ConnectEvent) {
 	log.Println("Connected to Mumble!")
@@ -32,10 +50,25 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 			if database.IsAdmin(e.User.UserID) {
 				return
 			}
+			if e.User.Channel.IsRoot() {
+				lobbyID, team := database.GetCurrentLobby(e.User.UserID)
+
+				if lobbyID != 0 {
+					moveUserToLobbyChannel(e.Client, e.User, lobbyID, team)
+					return
+				}
+			}
 
 			if allowed, reason := isUserAllowed(e.User, e.User.Channel); !allowed {
 				e.User.Send(reason)
-				e.User.Move(e.Client.Channels[0])
+				lobbyID, team := database.GetCurrentLobby(e.User.UserID)
+
+				if lobbyID != 0 {
+					moveUserToLobbyChannel(e.Client, e.User, lobbyID, team)
+				} else {
+					e.User.Move(e.Client.Channels[0])
+				}
+
 			} else if !e.User.Channel.IsRoot() &&
 				!strings.HasPrefix(e.User.Channel.Name, "Lobby") {
 				// user joined the correct team channel
@@ -81,6 +114,7 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.Send("The mumble authentication service is down, please contact admins, or try reconnecting.")
 			}
 			e.User.Send("Welcome to TF2Stadium!")
+
 		case e.Type.Has(gumble.UserChangeDisconnected):
 			bytes, _ := json.Marshal(event.Event{
 				Name:     event.PlayerMumbleLeft,
