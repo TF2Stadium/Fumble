@@ -26,6 +26,11 @@ func (Fumble) RemovePlayer(playerID uint, _ *struct{}) error {
 	return nil
 }
 
+func (Fumble) MoveUser(playerID uint, _ *struct{}) error {
+	mumble.Connection.MoveUser <- playerID
+	return nil
+}
+
 func StartRPC(url, queue string) {
 	rpc.Register(new(Fumble))
 	conn, err := amqp.Dial(url)

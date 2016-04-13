@@ -16,6 +16,7 @@ type Conn struct {
 	Remove chan uint
 
 	RemoveUser chan uint
+	MoveUser   chan uint
 }
 
 var Connection = &Conn{
@@ -24,6 +25,7 @@ var Connection = &Conn{
 	Create:        make(chan uint),
 	Remove:        make(chan uint),
 	RemoveUser:    make(chan uint),
+	MoveUser:      make(chan uint),
 }
 
 var (

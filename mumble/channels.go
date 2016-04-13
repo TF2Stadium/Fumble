@@ -82,6 +82,20 @@ func channelManage(conn *Conn) {
 				for _, user := range conn.client.Users {
 					if user.Channel.ID != 0 && user.UserID == uint32(userID) {
 						user.Move(conn.client.Channels[0])
+						break
+					}
+				}
+			})
+		case userID := <-conn.MoveUser:
+			lobbyID, team := database.GetCurrentLobby(uint32(userID))
+			if lobbyID == 0 {
+				continue
+			}
+			conn.client.Do(func() {
+				for _, user := range conn.client.Users {
+					if user.UserID == uint32(userID) {
+						moveUserToLobbyChannel(conn.client, user, lobbyID, team)
+						break
 					}
 				}
 			})
