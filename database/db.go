@@ -8,6 +8,7 @@ import (
 
 	"github.com/TF2Stadium/Helen/helpers"
 	"github.com/TF2Stadium/Helen/helpers/authority"
+	"github.com/TF2Stadium/Helen/models/lobby"
 	"github.com/TF2Stadium/Helen/models/lobby/format"
 	_ "github.com/lib/pq"
 )
@@ -77,4 +78,19 @@ func IsAdmin(userid uint32) bool {
 		return false
 	}
 	return role == helpers.RoleAdmin || role == helpers.RoleMod
+}
+
+func GetCurrentLobby(userid uint32) (uint, string) {
+	var lobbyID uint
+	var slot int
+	var lobbyFormat format.Format
+
+	err := db.QueryRow("SELECT lobby_slots.lobby_id, lobby_slots.slot, lobbies.type FROM lobbies INNER JOIN lobby_slots ON lobbies.id = lobby_slots.lobby_id WHERE lobby_slots.player_id = $1 AND lobbies.state <> $2 AND lobbies.state <> $3", userid, lobby.Ended, lobby.Initializing).Scan(&lobbyID, &slot, &lobbyFormat)
+	if err != nil && err != sql.ErrNoRows { // if err == ErrNoRows, player isn't in any active lobby
+		log.Println(err)
+	}
+
+	team, _, _ := format.GetSlotTeamClass(lobbyFormat, slot)
+
+	return lobbyID, team
 }
