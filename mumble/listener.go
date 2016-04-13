@@ -47,9 +47,7 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 				e.User.Send("The mumble authentication service is down, please contact admins, or try reconnecting.")
 				return
 			}
-			if database.IsAdmin(e.User.UserID) {
-				return
-			}
+
 			if e.User.Channel.IsRoot() {
 				lobbyID, team := database.GetCurrentLobby(e.User.UserID)
 
@@ -65,7 +63,7 @@ func (l Conn) OnUserChange(e *gumble.UserChangeEvent) {
 
 				if lobbyID != 0 {
 					moveUserToLobbyChannel(e.Client, e.User, lobbyID, team)
-				} else {
+				} else if !database.IsAdmin(e.User.UserID) {
 					e.User.Move(e.Client.Channels[0])
 				}
 
