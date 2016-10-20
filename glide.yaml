@@ -5,6 +5,7 @@ import:
   - models
 - package: github.com/kelseyhightower/envconfig
 - package: github.com/layeh/gumble
+  version: 23f185e4c5c34a037afd17cfbe905723ad47529e
   subpackages:
   - gumble
 - package: github.com/lib/pq
