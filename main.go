@@ -40,8 +40,6 @@ func main() {
 	database.Connect(config.DBAddr, config.DBName, config.DBUsername, config.DBPassword)
 
 	mumbleConf := gumble.NewConfig()
-	mumbleConf.TLSConfig.InsecureSkipVerify = true
-	mumbleConf.Address = config.MumbleAddress
 	mumbleConf.Username = config.MumbleUsername
 	mumbleConf.Password = config.MumblePassword
 
@@ -52,6 +50,6 @@ func main() {
 		log.Printf("Running profiler at %s", config.ProfilerAddr)
 	}
 
-	mumble.Connect(mumbleConf, config.RabbitMQURL, config.RabbitMQEventQueue)
+	mumble.Connect(mumbleConf, config.MumbleAddress, config.RabbitMQURL, config.RabbitMQEventQueue)
 	rpc.StartRPC(config.RabbitMQURL, config.RabbitMQRPCQueue)
 }

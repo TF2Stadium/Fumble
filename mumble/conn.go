@@ -33,7 +33,7 @@ var (
 	queueName   string
 )
 
-func Connect(config *gumble.Config, amqpURL, eventQueue string) {
+func Connect(config *gumble.Config, mumbleAddr, amqpURL, eventQueue string) {
 	var err error
 	amqpConn, err := amqp.Dial(amqpURL)
 	if err != nil {
@@ -52,13 +52,12 @@ func Connect(config *gumble.Config, amqpURL, eventQueue string) {
 
 	queueName = eventQueue
 
-	client := gumble.NewClient(config)
-	err = client.Connect()
+	client, err := gumble.Dial(mumbleAddr, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	Connection.client = client
 	go channelManage(Connection)
-	client.Attach(Connection)
+	config.Attach(Connection)
 }
